@@ -1,0 +1,23 @@
+{
+  "name": "chemical_formula",
+  "description": "Jquery plugin for chemical formula input",
+  "version": "0.0.1",
+  "dependencies": {
+    "jquery": ">=1.7"
+  },
+  "keywords": [
+    "jQuery",
+    "input",
+    "chemistry",
+    "chemical formula",
+    "molecular formula"
+  ],
+  "authors": [
+    {
+      "name": "Radil Radenkov",
+      "url": "http://chem.io/"
+    }
+  ],
+  "licenses": ["MIT"],
+  "main": "jquery.chemicalFormula.js"
+}
