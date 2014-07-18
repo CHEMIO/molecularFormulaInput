@@ -3,7 +3,7 @@ Molecular Formula Input
 
 jquery plugin for chemical formula input. It converts the numbers to subscript in the input field to make it more user friendly
 
-![preview](http://raw.githubusercontent.com/CHEMIO/molecularFormulaInput/master/docs/molecularFormula.png)
+![preview](https://raw.githubusercontent.com/CHEMIO/molecularFormulaInput/master/docs/molecularFormula.png)
 
 ##Usage##
 
