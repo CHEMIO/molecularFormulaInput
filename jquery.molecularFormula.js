@@ -1,4 +1,9 @@
-$.chemicalFormula = function(value, parse) {
+/*
+ *  value (string) - the molecular formula
+ *  parse (boolean) - default false. If this parameter is provided it converts from H₂O to plain text H2O
+ *                    it should be used on form submit to avoid adding sub characters in the database
+ */
+$.molecularFormula = function(value, parse) {
     var chars = '+−=()0123456789aeoxəijruvβγδφχ',
         sup   = '⁺⁻⁼⁽⁾⁰¹²³⁴⁵⁶⁷⁸⁹ᵃᵉᵒˣᵊⁱʲʳᵘᵛᵝᵞᵟᵠᵡ',  //For future use
         sub   = '₊₋₌₍₎₀₁₂₃₄₅₆₇₈₉ₐₑₒₓₔᵢⱼᵣᵤᵥᵦᵧᵨᵩᵪ',
@@ -25,16 +30,23 @@ $.chemicalFormula = function(value, parse) {
     }
 }
 
-$.fn.chemicalFormula = function() {
+/*
+ *   Usage:
+ *     $('input.fomula').molecularFormula()
+ */
+$.fn.molecularFormula = function() {
 
     $(this).bind('keypress', function(e) {
         var char = String.fromCharCode(e.which)
+        if (char.match(/\s/)) {
+            e.preventDefault()
+        }
         if (char.match(/[0-9]/)) {
             e.preventDefault()
             var old_sel = this.selectionStart
             this.value = [
                 this.value.substring(0, this.selectionStart),
-                $.chemicalFormula(char),
+                $.molecularFormula(char),
                 this.value.substring(this.selectionEnd)
             ].join('')
             this.selectionStart = this.selectionEnd = old_sel+1;
@@ -42,6 +54,6 @@ $.fn.chemicalFormula = function() {
     })
 
     return this.each(function() {
-        this.value = $.chemicalFormula(this.value)
+        this.value = $.molecularFormula(this.value)
     });
 }
