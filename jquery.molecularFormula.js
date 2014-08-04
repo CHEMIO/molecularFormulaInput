@@ -3,37 +3,6 @@
  *  parse (boolean) - default false. If this parameter is provided it converts from H₂O to plain text H2O
  *                    it should be used on form submit to avoid adding sub characters in the database
  */
-$.molecularFormula = function(value, parse) {
-    var chars = '+−=()0123456789aeoxəijruvβγδφχ',
-        sup   = '⁺⁻⁼⁽⁾⁰¹²³⁴⁵⁶⁷⁸⁹ᵃᵉᵒˣᵊⁱʲʳᵘᵛᵝᵞᵟᵠᵡ',  //For future use
-        sub   = '₊₋₌₍₎₀₁₂₃₄₅₆₇₈₉ₐₑₒₓₔᵢⱼᵣᵤᵥᵦᵧᵨᵩᵪ',
-        self  = this;
-
-    function sub_char(char) {
-        var n=chars.indexOf(char)
-        return n == -1 ? char : sub[n]
-    }
-
-    function normal_char(char) {
-        var n=sub.indexOf(char)
-        return n == -1 ? char : chars[n]
-    }
-
-    if (parse) {
-        return value.replace(new RegExp('['+sub+']', "g"), function(x) {
-            return x.split('').map(function(c) { return normal_char(c) }).join('')
-        });
-    } else {
-        return value.replace(/[0-9]*/g, function(x) {
-            return x.split('').map(function(c) { return sub_char(c) }).join('')
-        });
-    }
-}
-
-/*
- *   Usage:
- *     $('input.fomula').molecularFormula()
- */
 $.fn.molecularFormula = function() {
     var elements = [
         'H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne', 'Na', 'Mg', 'Al', 'Si', 'P', 'S', 'Cl',
@@ -106,6 +75,15 @@ $.fn.molecularFormula = function() {
         }
     }
 
+    function isElement(str) {
+        return str.match(new RegExp('('+elements.join('|')+')'+'$'))
+    }
+
+    function lastPart() {
+        var m = _this.val().substring(0, _this[0].selectionStart).match(/[a-zA-Z]+$/)
+        if (m) return m.toString()
+    }
+
     $(this)
         .bind('keypress', function(e) {
             e.preventDefault()
@@ -122,7 +100,7 @@ $.fn.molecularFormula = function() {
             } else if (char.match(/[a-zA-Z]/)) {
                 var last3 = this.value.substring(this.selectionStart-3, this.selectionStart)
                 if (last3.length == 3 && !last3.match(/[₀-₉]/)) return
-                if (!prev_char || prev_char.match(/[₀-₉]/)) {
+                if (!prev_char || prev_char.match(/[₀-₉]/) || (!isElement(lastPart()+char) && isElement(lastPart())) ) {
                     char = char.toUpperCase()
                 } else {
                     char = char.toLowerCase()
@@ -134,7 +112,7 @@ $.fn.molecularFormula = function() {
             this.selectionStart = this.selectionEnd = old_sel+1;
 
             if (char.match(/[a-zA-Z]/)) {
-                showAutocomplete(this.value.substring(0, this.selectionStart).match(/[a-zA-Z]+$/))
+                showAutocomplete(lastPart())
             }
         })
         .bind('keydown', function(e) {
@@ -161,7 +139,7 @@ $.fn.molecularFormula = function() {
                 if (_helper && _helper.is(':visible'))  {
                     this.selectionStart--
                 }
-                showAutocomplete(this.value.substring(0, this.selectionStart).match(/[a-zA-Z]+$/))
+                showAutocomplete(lastPart())
             }
         })
         .bind('blur', function() {
