@@ -146,6 +146,10 @@ $.fn.molecularFormula = function() {
                 showAutocomplete(lastPart())
             }
         })
+        .bind('paste', function(e) {
+            e.preventDefault()
+            this.value = $.molecularFormula(e.originalEvent.clipboardData.getData("text/plain"))
+        })
         .bind('keydown', function(e) {
             if (_helper && _helper.is(':visible'))  {
                 if (e.which == 38) {             //uparrow
