@@ -117,6 +117,7 @@ $.fn.molecularFormula = function() {
 
     $(this)
         .bind('keypress', function(e) {
+            if (e.which == 13) return
             e.preventDefault()
             var char = String.fromCharCode(e.which)
             var prev_char = this.value[this.selectionStart-1]
