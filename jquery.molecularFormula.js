@@ -56,7 +56,7 @@ $.fn.molecularFormula = function() {
         _q = str
         _helper.html('<li>'+_q+'</li>')
         var txtWidth = _helper.outerWidth()
-        var results = elements.filter(function (entry) { return entry.match(new RegExp('^'+str, 'gi')) });
+        var results = elements.filter(function (entry) { return entry.match(new RegExp('^'+str, 'gi')) }).sort();
         if (results.length <= 1) {
             return hideAutocomplete()
         }
