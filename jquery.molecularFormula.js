@@ -52,13 +52,17 @@ $.fn.molecularFormula = function() {
     }
 
     function showAutocomplete(str) {
+        if (!str) return
         _helper = _helper || $('<ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content"></ul>').appendTo('body')
         _q = str
         _helper.html('<li>'+_q+'</li>')
         var txtWidth = _helper.outerWidth()
-        var results = elements.filter(function (entry) { return entry.match(new RegExp('^'+str, 'gi')) }).sort();
+        var results = elements.filter(function (entry) {
+            return entry.match(new RegExp('^'+str, 'gi')) && formulaElements().indexOf(entry) == -1
+        }).sort();
         if (results.length <= 1) {
-            return hideAutocomplete()
+            hideAutocomplete()
+            return results.length > 0
         }
 
         _helper.css({top: _this.offset().top+_this.outerHeight(), left: _this.offset().left+txtWidth })
@@ -68,6 +72,7 @@ $.fn.molecularFormula = function() {
             _helper.append($('<li class="ui-menu-item">'+results[i]+'</li>'))
         }
         selectAutocomplete(0)
+        return results.length > 0
     }
 
     function hideAutocomplete() {
@@ -75,6 +80,7 @@ $.fn.molecularFormula = function() {
     }
 
     function selectAutocomplete(i) {
+        if (_helper.find('li').length == 0) return
         _helper.find('li').removeClass('ui-state-focus')
         var el = isNaN(i) ? i : _helper.find('li:nth-child('+(i+1)+')')
         el.addClass('ui-state-focus')
@@ -112,7 +118,11 @@ $.fn.molecularFormula = function() {
 
     function lastPart() {
         var m = _this.val().substring(0, _this[0].selectionStart).match(/[a-zA-Z]+$/)
-        if (m) return m.toString()
+        return m ? m.toString() : ''
+    }
+
+    function formulaElements() {
+        return _this.val().split(/[₀₁₂₃₄₅₆₇₈₉]+/).filter(function(n) { return n != ''})
     }
 
     $(this)
@@ -140,12 +150,15 @@ $.fn.molecularFormula = function() {
             }
 
             var old_sel = this.selectionStart
+
+            if (char.match(/[a-zA-Z]/) && !showAutocomplete(lastPart()+char)) {
+                showAutocomplete(lastPart())
+                return
+            }
+
             this.value = [ this.value.substring(0, this.selectionStart), char, this.value.substring(this.selectionEnd) ].join('')
             this.selectionStart = this.selectionEnd = old_sel+1;
-
-            if (char.match(/[a-zA-Z]/)) {
-                showAutocomplete(lastPart())
-            }
+            selectAutocomplete(0)
         })
         .bind('paste', function(e) {
             e.preventDefault()
@@ -172,14 +185,19 @@ $.fn.molecularFormula = function() {
         })
         .bind('keyup', function(e) {
             if (e.which == 8) {       //backspace
-                if (_helper && _helper.is(':visible'))  {
-                    this.selectionStart--
-                }
-                showAutocomplete(lastPart())
+                if (str = lastPart())
+                    showAutocomplete(lastPart())
+                else
+                    hideAutocomplete()
             }
         })
         .bind('blur', function() {
             hideAutocomplete()
+        })
+        .bind('focus', function() {
+            setTimeout(function() {
+                showAutocomplete(lastPart())
+            }, 1) //selectionStart = returns 0 if used without timeout
         })
         .attr('autocomplete','off')
 
