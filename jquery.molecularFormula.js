@@ -128,7 +128,6 @@ $.fn.molecularFormula = function() {
     $(this)
         .bind('keypress', function(e) {
             if (e.which == 13) return
-            e.preventDefault()
             var char = String.fromCharCode(e.which)
             var prev_char = this.value[this.selectionStart-1]
 
@@ -156,9 +155,13 @@ $.fn.molecularFormula = function() {
                 return
             }
 
-            this.value = [ this.value.substring(0, this.selectionStart), char, this.value.substring(this.selectionEnd) ].join('')
-            this.selectionStart = this.selectionEnd = old_sel+1;
-            selectAutocomplete(0)
+            var _this = this
+            var _val = [ this.value.substring(0, this.selectionStart), char, this.value.substring(this.selectionEnd) ].join('')
+            setTimeout(function() {
+                _this.value = _val
+                _this.selectionStart = _this.selectionEnd = old_sel+1;
+                selectAutocomplete(0)
+            },0)
         })
         .bind('paste', function(e) {
             e.preventDefault()
