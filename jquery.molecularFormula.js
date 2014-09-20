@@ -51,15 +51,19 @@ $.fn.molecularFormula = function() {
     function helper() {
     }
 
+    function getResults(str) {
+        return elements.filter(function (entry) {
+            return entry.match(new RegExp('^'+str, 'gi')) && formulaElements().indexOf(entry) == -1
+        }).sort();
+    }
+
     function showAutocomplete(str) {
         if (!str) return
         _helper = _helper || $('<ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content"></ul>').appendTo('body')
         _q = str
         _helper.html('<li>'+_q+'</li>')
         var txtWidth = _helper.outerWidth()
-        var results = elements.filter(function (entry) {
-            return entry.match(new RegExp('^'+str, 'gi')) && formulaElements().indexOf(entry) == -1
-        }).sort();
+        var results = getResults(str)
         if (results.length <= 1) {
             hideAutocomplete()
             return results.length > 0
@@ -132,6 +136,7 @@ $.fn.molecularFormula = function() {
             var prev_char = this.value[this.selectionStart-1]
 
             if (!char.match(/[0-9a-zA-Z]/)) {
+                e.preventDefault()
                 return
             } else if (char.match(/[0-9]/)) {
                 if (!prev_char) return
@@ -152,6 +157,7 @@ $.fn.molecularFormula = function() {
 
             if (char.match(/[a-zA-Z]/) && !showAutocomplete(lastPart()+char)) {
                 showAutocomplete(lastPart())
+                e.preventDefault()
                 return
             }
 
@@ -176,9 +182,9 @@ $.fn.molecularFormula = function() {
                     e.preventDefault()
                     selectNextAutocomplete()
                 } else if (e.which == 39) {      //right arrow
-                    showAutocomplete(this.value.match(/[a-zA-Z]+$/))
+                    hideAutocomplete()
                 } else if (e.which == 37) {      //left arrow
-                    e.preventDefault()
+                    hideAutocomplete()
                 } else if (e.which == 13) {      // Enter
                     e.preventDefault()
                     this.selectionStart = this.selectionEnd
@@ -188,10 +194,21 @@ $.fn.molecularFormula = function() {
         })
         .bind('keyup', function(e) {
             if (e.which == 8) {       //backspace
-                if (str = lastPart())
-                    showAutocomplete(lastPart())
-                else
+                if (str = lastPart()) {
+                    if (getResults().indexOf(str) == -1) {
+                        var oldSel = this.selectionStart
+                        this.value = [ this.value.substring(0, this.selectionStart-1), this.value.substring(this.selectionStart) ].join('')
+                        this.selectionEnd = this.selectionStart = oldSel-1
+                        if (str = lastPart())
+                            showAutocomplete(str)
+                        else
+                            hideAutocomplete()
+                    } else {
+                        showAutocomplete(str)
+                    }
+                } else {
                     hideAutocomplete()
+                }
             }
         })
         .bind('blur', function() {

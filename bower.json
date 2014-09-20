@@ -1,7 +1,7 @@
 {
   "name": "molecularFormulaInput",
   "description": "Jquery plugin for molecular formula input",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "dependencies": {
     "jquery": ">=1.7"
   },
