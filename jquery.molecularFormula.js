@@ -170,8 +170,8 @@ $.fn.molecularFormula = function() {
             },0)
         })
         .bind('paste', function(e) {
-            e.preventDefault()
-            this.value = $.molecularFormula(e.originalEvent.clipboardData.getData("text/plain"))
+            var v = $.molecularFormula(e.originalEvent.clipboardData.getData("text/plain"))
+            setTimeout(function() { e.target.value = v; }, 1)
         })
         .bind('keydown', function(e) {
             if (_helper && _helper.is(':visible'))  {
