@@ -139,7 +139,10 @@ $.fn.molecularFormula = function() {
                 e.preventDefault()
                 return
             } else if (char.match(/[0-9]/)) {
-                if (!prev_char) return
+                if (!prev_char) {
+                    e.preventDefault()
+                    return
+                }
                 char = $.molecularFormula(char)
                 if (_helper.is(':visible')) this.selectionStart = this.selectionEnd
                 hideAutocomplete()
