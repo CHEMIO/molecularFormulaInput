@@ -132,17 +132,14 @@ $.fn.molecularFormula = function() {
     $(this)
         .bind('keypress', function(e) {
             if (e.which == 13) return
+            e.preventDefault();
             var char = String.fromCharCode(e.which)
             var prev_char = this.value[this.selectionStart-1]
 
             if (!char.match(/[0-9a-zA-Z]/)) {
-                e.preventDefault()
                 return
             } else if (char.match(/[0-9]/)) {
-                if (!prev_char) {
-                    e.preventDefault()
-                    return
-                }
+                if (!prev_char) return
                 char = $.molecularFormula(char)
                 if (_helper.is(':visible')) this.selectionStart = this.selectionEnd
                 hideAutocomplete()
@@ -155,22 +152,18 @@ $.fn.molecularFormula = function() {
                     char = char.toLowerCase()
                 }
             }
-
             var old_sel = this.selectionStart
 
             if (char.match(/[a-zA-Z]/) && !showAutocomplete(lastPart()+char)) {
                 showAutocomplete(lastPart())
-                e.preventDefault()
                 return
             }
 
-            var _this = this
-            var _val = [ this.value.substring(0, this.selectionStart), char, this.value.substring(this.selectionEnd) ].join('')
-            setTimeout(function() {
-                _this.value = _val
-                _this.selectionStart = _this.selectionEnd = old_sel+1;
-                selectAutocomplete(0)
-            },0)
+            this.value = [ this.value.substring(0, this.selectionStart), char, this.value.substring(this.selectionEnd) ].join('')
+            this.selectionStart = this.selectionEnd = old_sel+1;
+            selectAutocomplete(0)
+            $(this).trigger('change')
+            return false;
         })
         .bind('paste', function(e) {
             var v = $.molecularFormula(e.originalEvent.clipboardData.getData("text/plain"))
