@@ -117,7 +117,7 @@ $.fn.molecularFormula = function() {
     }
 
     function isElement(str) {
-        return str.match(new RegExp('('+elements.join('|')+')'+'$'))
+        return str.match(new RegExp('^('+elements.join('|')+')'+'$'))
     }
 
     function lastPart() {
@@ -155,8 +155,7 @@ $.fn.molecularFormula = function() {
             var old_sel = this.selectionStart
 
             if (char.match(/[a-zA-Z]/) && !showAutocomplete(lastPart()+char)) {
-                showAutocomplete(lastPart())
-                return
+                char = char.toUpperCase()
             }
 
             this.value = [ this.value.substring(0, this.selectionStart), char, this.value.substring(this.selectionEnd) ].join('')
